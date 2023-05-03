@@ -172,7 +172,7 @@ $(document).ready(function () {
 		soundfontUrl: "./midi-js/soundfont/",
 		instruments: [
 			"trumpet",
-			"acoustic_grand_piano",
+			/* 			"acoustic_grand_piano",
 			"electric_grand_piano",
 			"church_organ",
 			"acoustic_guitar_nylon",
@@ -180,7 +180,7 @@ $(document).ready(function () {
 			"electric_bass_finger",
 			"violin",
 			"voice_oohs",
-			"clarinet",
+			"clarinet", */
 		],
 		onprogress: function (state, progress) {
 			console.log(state, progress);
