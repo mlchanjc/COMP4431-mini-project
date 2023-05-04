@@ -34,6 +34,7 @@ let divisionMultiplier = 16;
 let reverseScale = false;
 let redlineTime = 0; //The time of the redline representing
 let intervalId; //For storing the id of the repeating function for displaying the redline
+let isMouseDown = false;
 
 /* Initialize literally everything here */
 canvas.style.border = "1px solid #000000";
@@ -64,12 +65,9 @@ playButton.addEventListener("click", () => {
 		playButton.textContent = "Play";
 		clearInterval(intervalId);
 		intervalId = null;
-		startingTime = Number(timeSlider.value);
-		redlineTime = startingTime;
-		endingTime = divisionTime * division + startingTime;
 	} else {
 		playButton.textContent = "Stop";
-		redlineTime = startingTime;
+		if (redlineTime < startingTime) redlineTime = startingTime;
 		intervalId = setInterval(() => {
 			redlineTime += Math.round(1000 / FPS);
 			if (redlineTime > endingTime) {
@@ -88,4 +86,28 @@ filedrop.addEventListener("change", (e) => {
 		document.querySelector("#FileDrop #Text").textContent = file.name;
 		parseFile(file);
 	}
+});
+
+//Set redline position by clicking the canvas
+canvas.addEventListener("mousemove", (event) => {
+	if (isMouseDown) {
+		const rect = canvas.getBoundingClientRect();
+		const x = event.clientX - rect.left - window.scrollX;
+		const y = event.clientY - rect.top - window.scrollY;
+		if (x > KEY_W) {
+			redlineTime = startingTime + ((x - KEY_W) / (CANVAS_W - KEY_W)) * (endingTime - startingTime);
+			renderDisplay();
+		} else {
+			redlineTime = startingTime;
+			renderDisplay();
+		}
+	}
+});
+
+canvas.addEventListener("mousedown", (event) => {
+	if (event.button === 0) isMouseDown = true;
+});
+
+canvas.addEventListener("mouseup", (event) => {
+	if (event.button === 0) isMouseDown = false;
 });
