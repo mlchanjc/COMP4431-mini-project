@@ -86,20 +86,22 @@ function handlePianoMouseDown(evt) {
 	// Determine which piano key has been clicked on
 	// evt.target tells us which item triggered this function
 	// The piano key number is extracted from the key id (0-23)
-	let key_number = $(evt.target).attr("id").substring(4);
-	key_number = parseInt(key_number);
+	let key_number = $(evt.target).attr("id")?.substring(4);
+	if (key_number) {
+		key_number = parseInt(key_number);
 
-	// Start the note
-	handleNoteOn(key_number);
+		// Start the note
+		handleNoteOn(key_number);
 
-	// Select the key
-	$("#key-" + key_number).focus();
+		// Select the key
+		$("#key-" + key_number).focus();
 
-	// Show a simple message in the console
-	console.log("Piano mouse down event for key " + key_number + "!");
+		// Show a simple message in the console
+		console.log("Piano mouse down event for key " + key_number + "!");
 
-	// Remember the key number
-	last_mouse_key_number = key_number;
+		// Remember the key number
+		last_mouse_key_number = key_number;
+	}
 }
 
 function handlePianoMouseUp(evt) {

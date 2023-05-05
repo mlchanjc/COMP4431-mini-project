@@ -67,14 +67,15 @@ playButton.addEventListener("click", () => {
 		intervalId = null;
 	} else {
 		playButton.textContent = "Stop";
-		if (redlineTime < startingTime) redlineTime = startingTime;
 		intervalId = setInterval(() => {
-			redlineTime += Math.round(1000 / FPS);
-			if (redlineTime > endingTime) {
-				startingTime = endingTime + 1;
-				endingTime = divisionTime * division + startingTime;
+			if (redlineTime <= Math.floor(midiFile.duration * 1000)) {
+				redlineTime += Math.round(1000 / FPS);
+				if (redlineTime > endingTime) {
+					startingTime = endingTime + 1;
+					endingTime = divisionTime * division + startingTime;
+				}
+				renderDisplay();
 			}
-			renderDisplay();
 		}, Math.round(1000 / FPS));
 	}
 });
@@ -91,18 +92,27 @@ filedrop.addEventListener("change", (e) => {
 //Set redline position by clicking the canvas
 canvas.addEventListener("mousemove", (event) => {
 	if (isMouseDown) {
-		const rect = canvas.getBoundingClientRect();
-		const x = event.clientX - rect.left - window.scrollX;
-		const y = event.clientY - rect.top - window.scrollY;
-		if (x > KEY_W) {
-			redlineTime = startingTime + ((x - KEY_W) / (CANVAS_W - KEY_W)) * (endingTime - startingTime);
-			renderDisplay();
-		} else {
-			redlineTime = startingTime;
-			renderDisplay();
-		}
+		setRedlineTime(event);
 	}
 });
+
+canvas.addEventListener("click", (event) => {
+	setRedlineTime(event);
+});
+
+const setRedlineTime = (event) => {
+	const rect = canvas.getBoundingClientRect();
+	const x = event.clientX - rect.left - window.scrollX;
+	if (x > KEY_W) {
+		redlineTime = startingTime + ((x - KEY_W) / (CANVAS_W - KEY_W)) * (endingTime - startingTime);
+	} else {
+		redlineTime = startingTime;
+	}
+	if (redlineTime > Math.ceil(midiFile.duration * 1000)) {
+		redlineTime = Math.ceil(midiFile.duration * 1000);
+	}
+	renderDisplay();
+};
 
 canvas.addEventListener("mousedown", (event) => {
 	if (event.button === 0) isMouseDown = true;

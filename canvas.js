@@ -101,6 +101,7 @@ const renderDisplay = () => {
 	canvasContext.fillStyle = "white";
 	canvasContext.fillRect(0, 0, CANVAS_W, CANVAS_H);
 
+	//Render track name
 	canvasContext.lineWidth = 0.5;
 	canvasContext.fillStyle = "lightblue";
 	canvasContext.fillRect(0, 0, KEY_W, HEADER_H);
@@ -110,32 +111,36 @@ const renderDisplay = () => {
 	canvasContext.font = "20px Arial";
 	canvasContext.fillText(`Track ${selectedTrack}`, 5, HEADER_H / 2, KEY_W);
 
+	//Render timestamps
 	for (let i = 0; i < division; i++) {
-		canvasContext.fillText(
-			`${parseTime(startingTime + divisionTime * i)}`,
-			5 + KEY_W + ((CANVAS_W - KEY_W) / division) * i,
-			HEADER_H / 2,
-			KEY_W
-		);
+		if (startingTime + divisionTime * i <= Math.floor(midiFile.duration * 1000)) {
+			canvasContext.fillText(
+				`${parseTime(startingTime + divisionTime * i)}`,
+				5 + KEY_W + ((CANVAS_W - KEY_W) / division) * i,
+				HEADER_H / 2,
+				KEY_W
+			);
+		}
 	}
 
 	renderTrack();
 
 	for (let i = 0; i < KEYS_SHOWN; i++) {
+		//Render piano keys
 		const isBlackKey =
 			heptatonicScaleNames[reverseScale ? heptatonicScaleNames.length - 1 - startingScale - i : i + startingScale]
 				.isBlackKey;
 		const name =
 			heptatonicScaleNames[reverseScale ? heptatonicScaleNames.length - 1 - startingScale - i : i + startingScale].name;
-
 		canvasContext.fillStyle = isBlackKey ? "black" : "white";
 		canvasContext.fillRect(0, HEADER_H + TRACK_H * i, KEY_W, TRACK_H);
 		canvasContext.fillStyle = "black";
 		canvasContext.strokeRect(0, HEADER_H + TRACK_H * i, KEY_W, TRACK_H);
 		canvasContext.fillRect(CANVAS_W / 15, HEADER_H + TRACK_H * i - 0.5, CANVAS_W - KEY_W, 0.5);
-
 		canvasContext.fillStyle = isBlackKey ? "white" : "black";
 		canvasContext.fillText(name, 5, HEADER_H + TRACK_H * i + TRACK_H / 2 + KEYS_SHOWN / 2.5, KEY_W);
+
+		//Render the square things
 		for (let j = 0; j < division; j++) {
 			canvasContext.fillStyle = "black";
 			canvasContext.fillRect(
@@ -147,7 +152,7 @@ const renderDisplay = () => {
 		}
 	}
 
-	//Rendering the red line
+	//Render the red line
 	canvasContext.fillStyle = "red";
 	const msPerPixel = (endingTime - startingTime) / (CANVAS_W - KEY_W);
 	if (redlineTime >= startingTime && redlineTime <= endingTime)
