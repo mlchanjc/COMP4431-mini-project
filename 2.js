@@ -1,5 +1,5 @@
 $(".load-demo-midi-file-btn").click((event) => {
-	// <button data-filename="XXX.mid"></button>
+	// <button class="load-demo-midi-file-btn" data-filename="XXX.mid"></button>
 	const filename = $(event.target).data("filename");
 	fetch(`sampleData/${filename}`)
 		.then((response) => {
