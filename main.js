@@ -84,6 +84,7 @@ filedrop.addEventListener("change", (e) => {
 	const files = e.target.files;
 	if (files.length > 0) {
 		const file = files[0];
+		// Cross ref .load-demo-midi-file-btn onClick callback
 		document.querySelector("#FileDrop #Text").textContent = file.name;
 		parseFile(file);
 	}
