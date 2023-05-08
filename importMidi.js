@@ -52,7 +52,8 @@ const renderList = () => {
 		}
 		tracks.forEach((track, index) => {
 			const li = document.createElement("li");
-			const name = `Track ${index + 1}`;
+			const name = `Track ${index + 1}` + (track.name ? `: ${track.name}` : "");
+			li.dataset.trackId = index + 1; // <li data-track-id="1">...</li>
 			li.innerHTML = `
         		<div class="list-item">
           			<span class="track-name">${name}</span>
@@ -62,21 +63,45 @@ const renderList = () => {
 							// more instruments to be added 
 						</select>
         			</div>
-          			<button class="delete-button">Delete</button>
+          			<button class="btn btn-danger track-list-delete-track-btn">Delete</button>
        			</div>
       		`;
 			list.appendChild(li);
 		});
 		listContainer.style.display = "block";
 		emptyMessage.style.display = "none";
-		const listItems = document.querySelectorAll(".track-name");
-		listItems.forEach((item) => {
-			item.addEventListener("click", (event) => {
-				selectedTrack = item.textContent.split(" ")[1];
-				renderDisplay();
-			});
-		});
 	} else {
 		emptyMessage.style.display = "block";
 	}
 };
+
+// Select track click handler
+$(list).on("click", "li", function (event) {
+	// Delegated event handlers ref https://api.jquery.com/on/#direct-and-delegated-events
+	// Ignore if the click is on a button or select
+	if (["BUTTON", "SELECT"].includes($(event.target).prop("nodeName"))) {
+		return;
+	}
+
+	selectedTrack = $(this).data("trackId");
+
+	renderDisplay();
+});
+
+// Delete track click handler
+$(list).on("click", ".track-list-delete-track-btn", function (event) {
+	// Delegated event handlers ref https://api.jquery.com/on/#direct-and-delegated-events
+	const trackId = $(this).closest("li").data("trackId");
+	midiFile.tracks.splice(trackId - 1, 1);
+	tracks = [];
+	midiFile.tracks.forEach((track) => {
+		tracks.push(track);
+	});
+
+	if (selectedTrack > trackId) {
+		selectedTrack--;
+	}
+
+	renderList();
+	renderDisplay();
+});

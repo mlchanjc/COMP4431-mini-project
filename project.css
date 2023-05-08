@@ -68,16 +68,3 @@
     padding: 10px;
     text-align: center;
 }
-
-.edit-button,
-.delete-button {
-    padding: 5px 10px;
-    border: none;
-    background-color: #ccc;
-    color: #fff;
-    cursor: pointer;
-}
-
-.delete-button {
-    background-color: #dc3545;
-}
