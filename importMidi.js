@@ -6,6 +6,7 @@ const parseFile = (file) => {
 		canvasContext.fillStyle = "white";
 		canvasContext.fillRect(0, 0, CANVAS_W, CANVAS_H);
 
+		//Setting up variables
 		midiFile = new Midi(e.target.result);
 		tickPerSec = Math.round(midiFile.durationTicks / midiFile.duration);
 		bpm = tickPerSec / (midiFile.header.ppq / 60);
@@ -26,8 +27,15 @@ const parseFile = (file) => {
 		midiFile.tracks.forEach((track) => {
 			tracks.push(track);
 		});
+
+		midiBlob = new Blob([midiFile.toArray()], { type: "audio/midi" });
+		const reader2 = new FileReader();
+		reader2.onload = function (e) {
+			midiBase64 = e.target.result;
+		};
+		reader2.readAsDataURL(midiBlob);
+
 		renderList();
-		currentMidi = midiFile;
 	};
 	reader.readAsArrayBuffer(file);
 };
@@ -69,39 +77,4 @@ const renderList = () => {
 	} else {
 		emptyMessage.style.display = "block";
 	}
-
-	document.querySelector("tone-play-toggle").removeAttribute("disabled");
 };
-
-//Tried using tone js to play the audio but not that good
-
-/* const synths = [];
-document.querySelector("tone-play-toggle").addEventListener("play", (e) => {
-	const playing = e.detail;
-	if (playing && currentMidi) {
-		const now = Tone.now() - 1.2;
-		currentMidi.tracks.forEach((track) => {
-			//create a synth for each track
-			const synth = new Tone.PolySynth(Tone.Synth, {
-				envelope: {
-					attack: 0.02,
-					decay: 0.1,
-					sustain: 0.3,
-					release: 1,
-				},
-			}).toDestination();
-			synths.push(synth);
-			//schedule all of the events
-			track.notes.forEach((note) => {
-				synth.triggerAttackRelease(note.name, note.duration, note.time + now, note.velocity);
-			});
-		});
-	} else {
-		//dispose the synth and make a new one
-		while (synths.length) {
-			const synth = synths.pop();
-			synth.triggerRelease();
-			synth.disconnect();
-		}
-	}
-}); */

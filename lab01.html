@@ -30,12 +30,6 @@
   <!-- convert midi to json -->
   <script src="https://unpkg.com/@tonejs/midi"></script>
 
-  <!-- tone.js -->
-  <script type="text/javascript" src="https://unpkg.com/tone@latest/build/Tone.js"></script>
-  <script type="text/javascript" src="https://unpkg.com/@tonejs/ui@0.0.8/build/tonejs-ui.js"></script>
-
-
-
   <title>COMP4431 Multimedia Computing - MIDI Keyboard</title>
 
   <style>
@@ -250,9 +244,8 @@
     </div>
 
     <div>
-      <tone-play-toggle disabled></tone-play-toggle>
-
-      <button type="button" class="btn btn-info load-demo-midi-file-btn" data-filename="into_the_unknown.mid">Load demo into_the_unknown.mid</button>
+      <button type="button" class="btn btn-info load-demo-midi-file-btn" data-filename="into_the_unknown.mid">Load demo
+        into_the_unknown.mid</button>
       <button type="button" class="btn btn-info" id="download-midi-file-btn">Download MIDI file</button>
 
       <div id="FileDrop">

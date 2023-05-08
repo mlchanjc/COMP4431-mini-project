@@ -1,7 +1,6 @@
 let midiFile = null; //The midi object
 let tickPerSec = null;
 let bpm = null;
-let currentMidi = null; //For tone js
 let tracks = [];
 const scaleSlider = document.getElementById("scale-slider");
 const maxScale = document.getElementById("max-scale");
@@ -35,6 +34,10 @@ let reverseScale = false;
 let redlineTime = 0; //The time of the redline representing
 let intervalId; //For storing the id of the repeating function for displaying the redline
 let isMouseDown = false;
+let delay = 300;
+
+let midiBlob = null;
+let midiBase64 = null;
 
 /* Initialize literally everything here */
 canvas.style.border = "1px solid #000000";
@@ -60,72 +63,68 @@ reverseScaleButton.addEventListener("click", () => {
 	renderDisplay();
 });
 
+const stopPlaying = () => {
+	playButton.textContent = "Play";
+	MIDI.Player.stop();
+	clearInterval(intervalId);
+	intervalId = null;
+};
+
 playButton.addEventListener("click", () => {
 	if (intervalId) {
-		playButton.textContent = "Play";
-		MIDI.Player.stop();
-		clearInterval(intervalId);
-		intervalId = null;
+		stopPlaying();
 	} else {
 		// FIXME: Playback should continue at red line instead of at start
-		const midiBlob = new Blob([midiFile.toArray()], { type: "audio/midi" });
-		var reader = new FileReader();
-		reader.onload = function () {
-			console.log("loaded");
-			var midiBase64 = reader.result;
-			MIDI.Player.loadFile(
-				midiBase64,
-				() => {
-					console.log("success");
-					MIDI.Player.start();
-					redlineTime = MIDI.Player.currentTime * 1000;
+		MIDI.Player.BPM = null;
 
-					playButton.textContent = "Stop";
-					intervalId = setInterval(() => {
-						if (redlineTime <= Math.floor(midiFile.duration * 1000)) {
-							redlineTime += Math.round(1000 / FPS);
-							if (redlineTime > endingTime) {
-								startingTime = endingTime + 1;
-								endingTime = divisionTime * division + startingTime;
-							}
-							renderDisplay();
-						}
-					}, Math.round(1000 / FPS));
+		MIDI.Player.loadFile(midiBase64, () => {
+			console.log("success");
+			MIDI.Player.currentTime = redlineTime;
+			MIDI.Player.start();
+			console.log(MIDI.Player);
+			redlineTime = MIDI.Player.currentTime - delay;
+			playButton.textContent = "Stop";
+			intervalId = setInterval(() => {
+				console.log(MIDI.Player.currentTime);
+				if (redlineTime <= Math.floor(midiFile.duration * 1000)) {
+					redlineTime += Math.round(1000 / FPS);
+					if (redlineTime > endingTime) {
+						startingTime = endingTime + 1;
+						endingTime = divisionTime * division + startingTime;
+					}
+					renderDisplay();
+				} else stopPlaying();
+			}, Math.round(1000 / FPS));
 
-					// let a = performance.now();
-					// let authoritativeClockLast = 0;
-					// let MIDIlast = 0;
-					// let timelineLast = 0;
+			// let a = performance.now();
+			// let authoritativeClockLast = 0;
+			// let MIDIlast = 0;
+			// let timelineLast = 0;
 
-					// setInterval(() => {
-					// 	const authoritativeClockCurrent = performance.now();
-					// 	const MIDICurrent = MIDI.Player.currentTime;
-					// 	const timelineCurrent = redlineTime;
-					// 	console.log(
-					// 		`Authoritative Clock: ${(authoritativeClockCurrent - a).toFixed(
-					// 			12
-					// 		)} (From last: ${(
-					// 			authoritativeClockCurrent - authoritativeClockLast
-					// 		).toFixed(12)}) \tMIDIjs playing: ${MIDICurrent.toFixed(
-					// 			12
-					// 		)} (From last: ${(MIDICurrent - MIDIlast).toFixed(
-					// 			12
-					// 		)}) \tTimeline: ${timelineCurrent} (From last: ${(
-					// 			timelineCurrent - timelineLast
-					// 		).toFixed(12)}) \tDiff (MIDIjs-timeline): ${(
-					// 			MIDICurrent - timelineCurrent
-					// 		).toFixed(12)}`
-					// 	);
-					// 	authoritativeClockLast = authoritativeClockCurrent;
-					// 	MIDIlast = MIDI.Player.currentTime;
-					// 	timelineLast = redlineTime;
-					// }, 2000);
-				},
-				() => console.log("progress"),
-				(err) => console.log("error", err)
-			);
-		};
-		reader.readAsDataURL(midiBlob);
+			// setInterval(() => {
+			// 	const authoritativeClockCurrent = performance.now();
+			// 	const MIDICurrent = MIDI.Player.currentTime;
+			// 	const timelineCurrent = redlineTime;
+			// 	console.log(
+			// 		`Authoritative Clock: ${(authoritativeClockCurrent - a).toFixed(
+			// 			12
+			// 		)} (From last: ${(
+			// 			authoritativeClockCurrent - authoritativeClockLast
+			// 		).toFixed(12)}) \tMIDIjs playing: ${MIDICurrent.toFixed(
+			// 			12
+			// 		)} (From last: ${(MIDICurrent - MIDIlast).toFixed(
+			// 			12
+			// 		)}) \tTimeline: ${timelineCurrent} (From last: ${(
+			// 			timelineCurrent - timelineLast
+			// 		).toFixed(12)}) \tDiff (MIDIjs-timeline): ${(
+			// 			MIDICurrent - timelineCurrent
+			// 		).toFixed(12)}`
+			// 	);
+			// 	authoritativeClockLast = authoritativeClockCurrent;
+			// 	MIDIlast = MIDI.Player.currentTime;
+			// 	timelineLast = redlineTime;
+			// }, 2000);
+		});
 	}
 });
 
@@ -151,7 +150,7 @@ canvas.addEventListener("click", (event) => {
 });
 
 const setRedlineTime = (event) => {
-	// FIXME: Currently this does not work
+	stopPlaying();
 	const rect = canvas.getBoundingClientRect();
 	const x = event.clientX - rect.left - window.scrollX;
 	if (x > KEY_W) {
