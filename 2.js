@@ -23,6 +23,7 @@ $("#download-midi-file-btn").click((event) => {
 
 	// @tonejs/midi Encoding Midi https://github.com/Tonejs/Midi#encoding-midi
 	// Note: This may not give the exact MIDI file as the input MIDI file. e.g. Channels are split into multiple tracks.
+	// Ref @tonejs/midi Midi/src/Midi.ts#splitTracks
 	// https://stackoverflow.com/a/76126858
 	const downloadUrl = URL.createObjectURL(midiBlob);
 	const link = document.createElement("a");
