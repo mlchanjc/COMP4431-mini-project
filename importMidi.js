@@ -28,7 +28,9 @@ const parseFile = (file) => {
 			tracks.push(track);
 		});
 
+		const t0 = performance.now();
 		midiBlob = new Blob([midiFile.toArray()], { type: "audio/midi" });
+		console.log(`Encoding MIDI took ${performance.now() - t0} milliseconds.`);
 		const reader2 = new FileReader();
 		reader2.onload = function (e) {
 			midiBase64 = e.target.result;
