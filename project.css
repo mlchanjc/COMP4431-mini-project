@@ -32,28 +32,28 @@
     overflow-y: auto; /* enable vertical scrolling */
     border: 2px solid darkgray;
 }
-  
+
 .list {
     list-style: none;
     margin: 0;
     padding: 0;
 }
-  
+
 .list li {
     padding: 10px 0px;
     border-bottom: 1px solid #ccc;
 }
 
-.list li:Hover{
+.list li:hover {
     background-color: lightblue;
 }
 
-.list-item{
+.list-item {
     display: flex;
     align-items: center;
 }
 
-.list-item .input-group{
+.list-item .input-group {
     flex: 3;
     background-color: red;
 }
@@ -69,14 +69,15 @@
     text-align: center;
 }
 
-.edit-button, .delete-button {
+.edit-button,
+.delete-button {
     padding: 5px 10px;
     border: none;
     background-color: #ccc;
     color: #fff;
     cursor: pointer;
 }
-  
+
 .delete-button {
     background-color: #dc3545;
 }
