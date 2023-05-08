@@ -34,7 +34,10 @@ let reverseScale = false;
 let redlineTime = 0; //The time of the redline representing
 let intervalId; //For storing the id of the repeating function for displaying the redline
 let isMouseDown = false;
-let delay = 300;
+
+let startRefTime = 0; // For storing the reference time for the start of the song
+// Unit: performance.now() [high resolution timestamp in milliseconds]
+// Used to calculate red line position
 
 let midiBlob = null;
 let midiBase64 = null;
@@ -66,6 +69,8 @@ reverseScaleButton.addEventListener("click", () => {
 const stopPlaying = () => {
 	playButton.textContent = "Play";
 	MIDI.Player.stop();
+	MIDI.Player.clearAnimation(); // Otherwise it may continue to call the callback function
+	startRefTime = 0;
 	clearInterval(intervalId);
 	intervalId = null;
 };
@@ -79,15 +84,28 @@ playButton.addEventListener("click", () => {
 
 		MIDI.Player.loadFile(midiBase64, () => {
 			console.log("success");
+
+			MIDI.Player.setAnimation(({ now, end, events }) => {
+				// console.log(
+				// 	`now: ${now * 1000}, diff: ${
+				// 		now * 1000 - redlineTime
+				// 	} end: ${end}, events: ${JSON.stringify(events)}`
+				// );
+				if (now === 0) {
+					// console.log("SKIPPED updating startRefTime");
+					return;
+				}
+				redlineTime = now * 1000;
+				startRefTime = performance.now() - now * 1000;
+			});
+
 			MIDI.Player.currentTime = redlineTime;
 			MIDI.Player.start();
-			console.log(MIDI.Player);
-			redlineTime = MIDI.Player.currentTime - delay;
+			startRefTime = performance.now() - redlineTime;
 			playButton.textContent = "Stop";
 			intervalId = setInterval(() => {
-				console.log(MIDI.Player.currentTime);
 				if (redlineTime <= Math.floor(midiFile.duration * 1000)) {
-					redlineTime += Math.round(1000 / FPS);
+					redlineTime = performance.now() - startRefTime;
 					if (redlineTime > endingTime) {
 						startingTime = endingTime + 1;
 						endingTime = divisionTime * division + startingTime;
@@ -95,35 +113,6 @@ playButton.addEventListener("click", () => {
 					renderDisplay();
 				} else stopPlaying();
 			}, Math.round(1000 / FPS));
-
-			// let a = performance.now();
-			// let authoritativeClockLast = 0;
-			// let MIDIlast = 0;
-			// let timelineLast = 0;
-
-			// setInterval(() => {
-			// 	const authoritativeClockCurrent = performance.now();
-			// 	const MIDICurrent = MIDI.Player.currentTime;
-			// 	const timelineCurrent = redlineTime;
-			// 	console.log(
-			// 		`Authoritative Clock: ${(authoritativeClockCurrent - a).toFixed(
-			// 			12
-			// 		)} (From last: ${(
-			// 			authoritativeClockCurrent - authoritativeClockLast
-			// 		).toFixed(12)}) \tMIDIjs playing: ${MIDICurrent.toFixed(
-			// 			12
-			// 		)} (From last: ${(MIDICurrent - MIDIlast).toFixed(
-			// 			12
-			// 		)}) \tTimeline: ${timelineCurrent} (From last: ${(
-			// 			timelineCurrent - timelineLast
-			// 		).toFixed(12)}) \tDiff (MIDIjs-timeline): ${(
-			// 			MIDICurrent - timelineCurrent
-			// 		).toFixed(12)}`
-			// 	);
-			// 	authoritativeClockLast = authoritativeClockCurrent;
-			// 	MIDIlast = MIDI.Player.currentTime;
-			// 	timelineLast = redlineTime;
-			// }, 2000);
 		});
 	}
 });
