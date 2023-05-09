@@ -265,39 +265,61 @@
       </div>
     </div>
   </div>
-  <canvas id="canvas"></canvas><br>
+  
+  <!-- Before modifying the table structure (e.g. adding tr, td), 
+       be sure to check the event handlers. They are set with nth-child
+  -->
+  <table id="myTable">
+    <tr>
+      <td rowspan="2" colspan="2">
+        <canvas id="canvas"></canvas>
+      </td>      
+      <td>
+        <!-- height set by JS (HEADER_H) -->
+      </td>
+    </tr>
+
+    <tr>
+      <td>
+        <div id="verticalScroll" style="overflow-y: scroll">
+          <!-- height set by JS (CANVAS_H - HEADER_H) -->
+          <div>
+            <!-- height set by JS -->
+            &nbsp;
+          </div>
+        </div>
+      </td>
+    </tr>
+      
+    <tr>
+      <td>
+        <!-- width set by JS (KEY_W) -->
+      </td>
+      <td>
+        <div>
+          <label for="time-slider">Time:</label>
+          <div class="input-group">
+            <div class="input-group-prepend">
+              <span class="input-group-text">0</span>
+            </div>
+            <div class="row flex-fill align-items-center mx-0 px-2 border rounded-left">
+              <input class="custom-range" id="time-slider" type="range" value="0">
+            </div>
+            <div class="input-group-append">
+              <span class="input-group-text" id="max-time">0</span>
+            </div>
+          </div>
+        </div>
+      </td>
+    </tr>
+  </table>  
+  
+  <br>
   <button id="reverse-scale">Reverse</button><br>
   <button id="play">Play</button>
   <button id="save" style="display: none">Save</button>
   <button id="cancel" style="display: none">Cancel</button>
-  <div class="col-6">
-    <label for="time-slider">Time:</label>
-    <div class="input-group">
-      <div class="input-group-prepend">
-        <span class="input-group-text">0</span>
-      </div>
-      <div class="row flex-fill align-items-center mx-0 px-2 border rounded-left">
-        <input class="custom-range" id="time-slider" type="range" value="0">
-      </div>
-      <div class="input-group-append">
-        <span class="input-group-text" id="max-time">0</span>
-      </div>
-    </div>
-  </div>
-  <div class="col-6">
-    <label for="scale-slider">Scale:</label>
-    <div class="input-group">
-      <div class="input-group-prepend">
-        <span class="input-group-text">21</span>
-      </div>
-      <div class="row flex-fill align-items-center mx-0 px-2 border rounded-left">
-        <input class="custom-range" id="scale-slider" type="range" value="21" min="21">
-      </div>
-      <div class="input-group-append">
-        <span class="input-group-text" id="max-scale">0</span>
-      </div>
-    </div>
-  </div>
+
   <div class="col-6">
     <label for="multiplier-slider">Multiplier:</label>
     <div class="input-group">

@@ -4,8 +4,6 @@ let recordedTrack = [];
 let tickPerSec = null;
 let bpm = null;
 let tracks = [];
-const scaleSlider = document.getElementById("scale-slider");
-const maxScale = document.getElementById("max-scale");
 const timeSlider = document.getElementById("time-slider");
 const maxTime = document.getElementById("max-time");
 const multiplierSlider = document.getElementById("multiplier-slider");
@@ -24,7 +22,8 @@ const TRACK_H = (CANVAS_H - HEADER_H) / KEYS_SHOWN; //Height of each key
 const canvas = document.getElementById("canvas");
 const canvasContext = canvas.getContext("2d");
 const FPS = 60; //FPS for the canvas display(mainly the red line)
-let startingScale = 0; //The index of the first shown scale
+const VERTICAL_SCROLL_SCALING_FACTOR = 111.11111; // This is tested by experiment the step of 1 scroll in Chrome
+let startingScale = 0; //The index (MIDI note number) of the first shown scale
 let division = 6; //Number of timestamps
 let selectedTrack = 0; // 1-based
 let startingTime = 0; //The starting time of the first timestamp
@@ -54,10 +53,23 @@ canvas.style.border = "1px solid #000000";
 canvas.width = CANVAS_W;
 canvas.height = CANVAS_H;
 
-scaleSlider.max = 108 - KEYS_SHOWN + 1;
-maxScale.textContent = String(108 - KEYS_SHOWN + 1);
-scaleSlider.addEventListener("input", (event) => {
-	startingScale = Number(event.target.value - 21);
+$("#myTable > tbody > tr:nth-child(1) > td:nth-child(2)").height(HEADER_H);
+$("#myTable > tbody > tr:nth-child(3) > td:nth-child(1)").width(KEY_W);
+
+$("#verticalScroll").height(CANVAS_H - HEADER_H);
+// 21 -> 89
+// 0 -> 68 (store this in startingScale)
+$("#verticalScroll div").height(
+	(108 - KEYS_SHOWN + 1 - 21) * VERTICAL_SCROLL_SCALING_FACTOR +
+		CANVAS_H -
+		HEADER_H
+);
+$("#verticalScroll").on("scroll", function () {
+	const newStartingScale = Math.floor(
+		$(this).scrollTop() / VERTICAL_SCROLL_SCALING_FACTOR
+	);
+	// console.log("scroll", $(this).scrollTop(), newStartingScale);
+	startingScale = Number(newStartingScale);
 	renderDisplay();
 });
 

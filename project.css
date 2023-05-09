@@ -68,3 +68,26 @@
     padding: 10px;
     text-align: center;
 }
+
+/* Actually I just want to hide the arrow buttons, but I can't find a way to do that */
+/* Demonstrate a "mostly customized" scrollbar
+ * (won't be visible otherwise if width/height is specified) */
+#verticalScroll::-webkit-scrollbar {
+    background-color: #aaa; /* or add it to the track */
+}
+
+/* Add a thumb */
+#verticalScroll::-webkit-scrollbar-thumb {
+    background: #000;
+}
+
+/* #myTable {
+    border-spacing: 0;
+}
+
+#myTable,
+#myTable th,
+#myTable td {
+    border: 1px solid black;
+    border-collapse: collapse;
+} */
