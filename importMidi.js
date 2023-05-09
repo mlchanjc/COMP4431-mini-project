@@ -75,7 +75,7 @@ const renderList = () => {
 			li.innerHTML = `
         		<div class="list-item">
           			<span class="track-name">${name}</span>
-          			<div class="input-group mb-3">
+          			<div class="input-group">
 						<select class="custom-select instrument-select">
 							${allInstrumentOptions}
 						</select>
