@@ -181,10 +181,15 @@
         </div>
       </div>
       <div class="row" style="display: inline; flex: 2">
-        <button type="button" class="btn btn-info" id="create-midi-file-btn">Create new file</button>
-        <button type="button" class="btn btn-info load-demo-midi-file-btn" data-filename="into_the_unknown.mid">Load
-          demo</button>
-        <button type="button" class="btn btn-info" id="download-midi-file-btn">Download MIDI file</button>
+        <button type="button" class="btn btn-info" id="create-midi-file-btn">
+			<i class="bi bi-plus-lg"></i> Create new file
+		</button>
+        <button type="button" class="btn btn-info load-demo-midi-file-btn" data-filename="into_the_unknown.mid">
+			<i class="bi bi-file-earmark-arrow-down"></i> Load demo
+		</button>
+        <button type="button" class="btn btn-info" id="download-midi-file-btn">
+			<i class="bi bi-download"></i> Download MIDI file
+		</button>
       </div>
     </div>
 
@@ -242,7 +247,7 @@
       </div>
       <div id="FileDrop">
         <div id="Text">
-          Drop a midi file here
+			<i class="bi bi-file-earmark-arrow-down"></i> Drop a midi file here
         </div>
         <input type="file" accept="audio/midi" />
       </div>
