@@ -50,6 +50,23 @@ const renderList = () => {
 		while (list.children.length > 0) {
 			list.removeChild(children[0]);
 		}
+
+		let allInstrumentOptions = "";
+		const groupBy = (x, f) =>
+			x.reduce((a, b, i) => ((a[f(b, i, x)] ||= []).push(b), a), {});
+		const instrumentsByGroup = groupBy(allInstruments, ({ family }) => family);
+		for (const [familyName, instruments] of Object.entries(
+			instrumentsByGroup
+		)) {
+			allInstrumentOptions += `<optgroup label="${familyName}">`;
+			instruments.forEach((instrument) => {
+				const id = parseInt(instrument.hexcode);
+				// allInstrumentOptions += `<option value="${id}">${instrument.family} - ${instrument.instrument}</option>`;
+				allInstrumentOptions += `<option value="${id}">${instrument.instrument}</option>`;
+			});
+			allInstrumentOptions += `</optgroup>`;
+		}
+
 		tracks.forEach((track, index) => {
 			const li = document.createElement("li");
 			const name = `Track ${index + 1}` + (track.name ? `: ${track.name}` : "");
@@ -58,14 +75,14 @@ const renderList = () => {
         		<div class="list-item">
           			<span class="track-name">${name}</span>
           			<div class="input-group mb-3">
-						<select class="custom-select" id="instrument">
-							<option selected value="56">${track.instrument.name}</option>
-							// more instruments to be added 
+						<select class="custom-select instrument-select">
+							${allInstrumentOptions}
 						</select>
         			</div>
           			<button class="btn btn-danger track-list-delete-track-btn">Delete</button>
        			</div>
       		`;
+			$(li).find(".instrument-select").val(track.instrument.number);
 			list.appendChild(li);
 		});
 		listContainer.style.display = "block";
@@ -86,6 +103,23 @@ $(list).on("click", "li", function (event) {
 	selectedTrack = $(this).data("trackId");
 
 	renderDisplay();
+});
+
+// Edit track input handler
+$(list).on("input", ".instrument-select", function (event) {
+	const trackId = $(this).closest("li").data("trackId");
+	const instrumentId = parseInt($(this).val());
+
+	tracks[trackId - 1].instrument.number = instrumentId;
+	midiFile.tracks[trackId - 1].instrument.number = instrumentId;
+
+	//Recompute the preview audio
+	midiBlob = new Blob([midiFile.toArray()], { type: "audio/midi" });
+	const reader = new FileReader();
+	reader.onload = function (e) {
+		midiBase64 = e.target.result;
+	};
+	reader.readAsDataURL(midiBlob);
 });
 
 // Delete track click handler
