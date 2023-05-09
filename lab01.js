@@ -105,14 +105,12 @@ function handlePianoMouseDown(evt) {
 			if (!isRecording) isRecording = true;
 			if (intervalId === null)
 				intervalId = setInterval(() => {
-					if (redlineTime <= Math.floor(midiFile.duration * 1000)) {
-						redlineTime += Math.round(1000 / FPS);
-						if (redlineTime > endingTime) {
-							startingTime = endingTime + 1;
-							endingTime = divisionTime * division + startingTime;
-						}
-						renderDisplay();
-					} else stopPlaying();
+					redlineTime += Math.round(1000 / FPS);
+					if (redlineTime > endingTime) {
+						startingTime = endingTime + 1;
+						endingTime = divisionTime * division + startingTime;
+					}
+					renderDisplay();
 				}, Math.round(1000 / FPS));
 			if (initTime === null) initTime = new Date().getTime();
 			if (initRedlineTime === null) initRedlineTime = redlineTime;
@@ -243,14 +241,12 @@ function handlePageKeyDown(evt) {
 		if (!isRecording) isRecording = true;
 		if (intervalId === null)
 			intervalId = setInterval(() => {
-				if (redlineTime <= Math.floor(midiFile.duration * 1000)) {
-					redlineTime += Math.round(1000 / FPS);
-					if (redlineTime > endingTime) {
-						startingTime = endingTime + 1;
-						endingTime = divisionTime * division + startingTime;
-					}
-					renderDisplay();
-				} else stopPlaying();
+				redlineTime += Math.round(1000 / FPS);
+				if (redlineTime > endingTime) {
+					startingTime = endingTime + 1;
+					endingTime = divisionTime * division + startingTime;
+				}
+				renderDisplay();
 			}, Math.round(1000 / FPS));
 		if (initTime === null) initTime = new Date().getTime();
 		if (initRedlineTime === null) initRedlineTime = redlineTime;
@@ -285,7 +281,6 @@ function handlePageKeyUp(evt) {
 
 	// Reset the key status
 	key_down_status[key_number] = false;
-	console.log(evt.key);
 	if (recordMode) {
 		for (let i = recordedTrack.length - 1; i >= 0; i--) {
 			if (recordedTrack[i].pitch === parseInt($("#pitch").val()) + key_number) {
@@ -354,7 +349,7 @@ $(document).ready(function () {
 	MIDI.loadPlugin({
 		soundfontUrl: "./midi-js/soundfont/",
 		instruments: [
-			"trumpet",
+			//"trumpet",
 			/* 			"acoustic_grand_piano",
 			"electric_grand_piano",
 			"church_organ",
@@ -386,7 +381,7 @@ $(document).ready(function () {
 
 			// At this point the MIDI system is ready
 			MIDI.setVolume(0, 127); // Set the volume level
-			MIDI.programChange(0, 56); // Use the General MIDI 'trumpet' number
+			MIDI.programChange(0, 1);
 
 			// Set up the event handlers for all the buttons
 			$("button").on("mousedown", handlePianoMouseDown);

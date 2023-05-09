@@ -34,6 +34,7 @@ let reverseScale = false;
 let redlineTime = 0; //The time of the redline representing
 let intervalId; //For storing the id of the repeating function for displaying the redline
 let isMouseDown = false;
+let isNewFile = false;
 
 // Source: https://github.com/mobyvb/midi-converter/blob/master/lib/instruments.json
 const allInstruments = [
@@ -204,12 +205,14 @@ $("#verticalScroll div").height(
 		HEADER_H
 );
 $("#verticalScroll").on("scroll", function () {
-	const newStartingScale = Math.floor(
-		$(this).scrollTop() / VERTICAL_SCROLL_SCALING_FACTOR
-	);
-	// console.log("scroll", $(this).scrollTop(), newStartingScale);
-	startingScale = Number(newStartingScale);
-	renderDisplay();
+	if (midiFile !== null) {
+		const newStartingScale = Math.floor(
+			$(this).scrollTop() / VERTICAL_SCROLL_SCALING_FACTOR
+		);
+		// console.log("scroll", $(this).scrollTop(), newStartingScale);
+		startingScale = Number(newStartingScale);
+		renderDisplay();
+	}
 });
 
 multiplierSlider.addEventListener("input", (event) => {
@@ -305,8 +308,14 @@ const setRedlineTime = (event) => {
 	} else {
 		redlineTime = startingTime;
 	}
-	if (redlineTime > Math.ceil(midiFile.duration * 1000)) {
-		redlineTime = Math.ceil(midiFile.duration * 1000);
+	if (isNewFile) {
+		if (redlineTime > endingTime) {
+			redlineTime = endingTime;
+		}
+	} else {
+		if (redlineTime > Math.ceil(midiFile.duration * 1000)) {
+			redlineTime = Math.ceil(midiFile.duration * 1000);
+		}
 	}
 	renderDisplay();
 };
@@ -330,6 +339,7 @@ $(document).keydown((e) => {
 			tobeAddedIndex = recordedTrack.length;
 			$("#save").css("display", recordedTrack.length > 0 ? "block" : "none");
 			$("#cancel").css("display", recordedTrack.length > 0 ? "block" : "none");
+			if (recordedTrack.length === 0) $("#play").css("display", "block");
 		} else {
 			recordMode = true;
 			initTime = null;

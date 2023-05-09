@@ -115,16 +115,27 @@ const renderDisplay = () => {
 
 	//Render timestamps
 	for (let i = 0; i < division; i++) {
-		if (
-			startingTime + divisionTime * i <=
-			Math.floor(midiFile.duration * 1000)
-		) {
-			canvasContext.fillText(
-				`${parseTime(startingTime + divisionTime * i)}`,
-				5 + KEY_W + ((CANVAS_W - KEY_W) / division) * i,
-				HEADER_H / 2,
-				KEY_W
-			);
+		if (isNewFile) {
+			if (startingTime + divisionTime * i <= endingTime) {
+				canvasContext.fillText(
+					`${parseTime(startingTime + divisionTime * i)}`,
+					5 + KEY_W + ((CANVAS_W - KEY_W) / division) * i,
+					HEADER_H / 2,
+					KEY_W
+				);
+			}
+		} else {
+			if (
+				startingTime + divisionTime * i <=
+				Math.floor(midiFile.duration * 1000)
+			) {
+				canvasContext.fillText(
+					`${parseTime(startingTime + divisionTime * i)}`,
+					5 + KEY_W + ((CANVAS_W - KEY_W) / division) * i,
+					HEADER_H / 2,
+					KEY_W
+				);
+			}
 		}
 	}
 
@@ -187,10 +198,10 @@ const renderDisplay = () => {
 };
 
 const renderTrack = () => {
-	const notes = tracks[selectedTrack - 1].notes;
+	const notes = tracks[selectedTrack - 1]?.notes;
 	const msPerPixel = (endingTime - startingTime) / (CANVAS_W - KEY_W);
 	canvasContext.fillStyle = "lightblue";
-	for (let i = 0; i < notes.length; i++) {
+	for (let i = 0; i < notes?.length; i++) {
 		let noteTime = Math.floor(notes[i].time * 1000);
 		let noteDuration = Math.floor(notes[i].duration * 1000);
 		if (noteTime + noteDuration < startingTime) continue;

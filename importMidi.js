@@ -3,6 +3,7 @@ const parseFile = (file) => {
 	const reader = new FileReader();
 	reader.onload = function (e) {
 		//Clear canvas
+		isNewFile = false;
 		canvasContext.fillStyle = "white";
 		canvasContext.fillRect(0, 0, CANVAS_W, CANVAS_H);
 
@@ -101,7 +102,7 @@ $(list).on("click", "li", function (event) {
 	}
 
 	selectedTrack = $(this).data("trackId");
-
+	MIDI.programChange(0, midiFile.tracks[selectedTrack - 1].instrument.number);
 	renderDisplay();
 });
 
@@ -112,6 +113,7 @@ $(list).on("input", ".instrument-select", function (event) {
 
 	tracks[trackId - 1].instrument.number = instrumentId;
 	midiFile.tracks[trackId - 1].instrument.number = instrumentId;
+	MIDI.programChange(0, instrumentId);
 
 	//Recompute the preview audio
 	midiBlob = new Blob([midiFile.toArray()], { type: "audio/midi" });

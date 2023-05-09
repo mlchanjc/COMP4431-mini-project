@@ -5,6 +5,7 @@
     border: 2px dashed black;
     color: black;
     margin: 20px auto;
+    flex: 1;
 }
 
 #FileDrop input {
@@ -77,6 +78,32 @@
 
 #verticalScroll::-webkit-scrollbar-thumb {
     background: #000;
+}
+
+#toolbar{
+    width: 1500px;
+    display: flex;
+    flex-direction: row;
+    justify-content:space-around;
+    flex-wrap: nowrap;
+    align-items: center;
+}
+
+.col-6{
+    flex: 1;
+}
+
+.input-group{
+    max-width: 250px;
+}
+
+#row2{
+    width: 1500px;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: space-around;
+    align-items: center;
 }
 
 /* #myTable {
