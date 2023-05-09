@@ -248,7 +248,7 @@ reverseScaleButton.addEventListener("click", () => {
 });
 
 const stopPlaying = () => {
-	playButton.textContent = "Play";
+	playButton.innerHTML = '<i class="bi bi-play-fill"></i> Play';
 	MIDI.Player.stop();
 	MIDI.Player.clearAnimation(); // Otherwise it may continue to call the callback function
 	startRefTime = 0;
@@ -281,7 +281,7 @@ playButton.addEventListener("click", () => {
 			MIDI.Player.currentTime = redlineTime;
 			MIDI.Player.start();
 			startRefTime = performance.now() - redlineTime;
-			playButton.textContent = "Stop";
+			playButton.innerHTML = '<i class="bi bi-pause"></i> Pause';
 			intervalId = setInterval(() => {
 				if (redlineTime <= Math.floor(midiFile.duration * 1000)) {
 					redlineTime = performance.now() - startRefTime;
