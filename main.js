@@ -221,6 +221,26 @@ multiplierSlider.addEventListener("input", (event) => {
 	endingTime = divisionTime * division + startingTime;
 	renderDisplay();
 });
+$("#zoom-out-btn").on("click", () => {
+	const newDivisionMultiplier = divisionMultiplier - 1;
+	if (newDivisionMultiplier < 1) return false;
+	if (newDivisionMultiplier > 32) return false;
+	divisionMultiplier = newDivisionMultiplier;
+	$(multiplierSlider).val(newDivisionMultiplier); // Update slider UI
+	divisionTime = unmultipliedDivisionTime * divisionMultiplier;
+	endingTime = divisionTime * division + startingTime;
+	renderDisplay();
+});
+$("#zoom-in-btn").on("click", () => {
+	const newDivisionMultiplier = divisionMultiplier + 1;
+	if (newDivisionMultiplier < 1) return false;
+	if (newDivisionMultiplier > 32) return false;
+	divisionMultiplier = newDivisionMultiplier;
+	$(multiplierSlider).val(newDivisionMultiplier); // Update slider UI
+	divisionTime = unmultipliedDivisionTime * divisionMultiplier;
+	endingTime = divisionTime * division + startingTime;
+	renderDisplay();
+});
 
 reverseScaleButton.addEventListener("click", () => {
 	reverseScale = !reverseScale;
