@@ -1,5 +1,4 @@
 let midiFile = null; //The midi object
-let editedmidiFile = null;
 let recordedTrack = [];
 let tickPerSec = null;
 let bpm = null;
