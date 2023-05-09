@@ -8,6 +8,7 @@ const parseFile = (file) => {
 
 		//Setting up variables
 		midiFile = new Midi(e.target.result);
+		editedmidiFile = new Midi(e.target.result);
 		tickPerSec = Math.round(midiFile.durationTicks / midiFile.duration);
 		bpm = tickPerSec / (midiFile.header.ppq / 60);
 		unmultipliedDivisionTime = 60000 / bpm / 4;
@@ -24,9 +25,8 @@ const parseFile = (file) => {
 
 		console.log(midiFile);
 		tracks = [];
-		midiFile.tracks.forEach((track) => {
-			tracks.push(track);
-		});
+		let temp = midiFile.tracks;
+		tracks = temp;
 
 		const t0 = performance.now();
 		midiBlob = new Blob([midiFile.toArray()], { type: "audio/midi" });

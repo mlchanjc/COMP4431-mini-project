@@ -101,6 +101,30 @@ function handlePianoMouseDown(evt) {
 
 		// Remember the key number
 		last_mouse_key_number = key_number;
+		if (recordMode) {
+			if (!isRecording) isRecording = true;
+			if (intervalId === null)
+				intervalId = setInterval(() => {
+					if (redlineTime <= Math.floor(midiFile.duration * 1000)) {
+						redlineTime += Math.round(1000 / FPS);
+						if (redlineTime > endingTime) {
+							startingTime = endingTime + 1;
+							endingTime = divisionTime * division + startingTime;
+						}
+						renderDisplay();
+					} else stopPlaying();
+				}, Math.round(1000 / FPS));
+			if (initTime === null) initTime = new Date().getTime();
+			if (initRedlineTime === null) initRedlineTime = redlineTime;
+			recordedTrack.push({
+				pitch: parseInt($("#pitch").val()) + key_number,
+				startTime: Math.round(
+					new Date().getTime() - initTime + initRedlineTime
+				),
+				duration: new Date().getTime(),
+				ended: false,
+			});
+		}
 	}
 }
 
@@ -120,6 +144,20 @@ function handlePianoMouseUp(evt) {
 
 	// Reset the key number
 	last_mouse_key_number = -1;
+	if (recordMode) {
+		for (let i = recordedTrack.length - 1; i >= 0; i--) {
+			if (
+				recordedTrack[i].pitch ===
+					parseInt($("#pitch").val()) + last_mouse_key_number &&
+				recordedTrack[i].duration === null
+			) {
+				recordedTrack[i].duration =
+					new Date().getTime() - recordedTrack[i].duration;
+				recordedTrack[i].ended = true;
+				break;
+			}
+		}
+	}
 }
 
 function handlePageKeyDown(evt) {
@@ -142,6 +180,28 @@ function handlePageKeyDown(evt) {
 
 	// Remember the key is down
 	key_down_status[key_number] = true;
+	if (recordMode) {
+		if (!isRecording) isRecording = true;
+		if (intervalId === null)
+			intervalId = setInterval(() => {
+				if (redlineTime <= Math.floor(midiFile.duration * 1000)) {
+					redlineTime += Math.round(1000 / FPS);
+					if (redlineTime > endingTime) {
+						startingTime = endingTime + 1;
+						endingTime = divisionTime * division + startingTime;
+					}
+					renderDisplay();
+				} else stopPlaying();
+			}, Math.round(1000 / FPS));
+		if (initTime === null) initTime = new Date().getTime();
+		if (initRedlineTime === null) initRedlineTime = redlineTime;
+		recordedTrack.push({
+			pitch: parseInt($("#pitch").val()) + key_number,
+			startTime: Math.round(new Date().getTime() - initTime + initRedlineTime),
+			duration: new Date().getTime(),
+			ended: false,
+		});
+	}
 }
 
 function handlePageKeyUp(evt) {
@@ -163,6 +223,16 @@ function handlePageKeyUp(evt) {
 
 	// Reset the key status
 	key_down_status[key_number] = false;
+	if (recordMode) {
+		for (let i = recordedTrack.length - 1; i >= 0; i--) {
+			if (recordedTrack[i].pitch === parseInt($("#pitch").val()) + key_number) {
+				recordedTrack[i].duration =
+					new Date().getTime() - recordedTrack[i].duration;
+				recordedTrack[i].ended = true;
+				break;
+			}
+		}
+	}
 }
 
 /*
