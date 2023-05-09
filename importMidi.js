@@ -8,6 +8,7 @@ const parseFile = (file) => {
 
 		//Setting up variables
 		midiFile = new Midi(e.target.result);
+		editedmidiFile = new Midi(e.target.result);
 		tickPerSec = Math.round(midiFile.durationTicks / midiFile.duration);
 		bpm = tickPerSec / (midiFile.header.ppq / 60);
 		unmultipliedDivisionTime = 60000 / bpm / 4;
@@ -24,9 +25,8 @@ const parseFile = (file) => {
 
 		console.log(midiFile);
 		tracks = [];
-		midiFile.tracks.forEach((track) => {
-			tracks.push(track);
-		});
+		let temp = midiFile.tracks;
+		tracks = temp;
 
 		midiBlob = new Blob([midiFile.toArray()], { type: "audio/midi" });
 		const reader2 = new FileReader();
@@ -67,9 +67,12 @@ const renderList = () => {
 		});
 		listContainer.style.display = "block";
 		emptyMessage.style.display = "none";
+		//Add listeners for all track name
 		const listItems = document.querySelectorAll(".track-name");
 		listItems.forEach((item) => {
 			item.addEventListener("click", (event) => {
+				recordMode = false;
+				recordedTrack = [];
 				selectedTrack = item.textContent.split(" ")[1];
 				renderDisplay();
 			});

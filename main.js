@@ -1,4 +1,6 @@
 let midiFile = null; //The midi object
+let editedmidiFile = null;
+let recordedTrack = [];
 let tickPerSec = null;
 let bpm = null;
 let tracks = [];
@@ -35,11 +37,34 @@ let redlineTime = 0; //The time of the redline representing
 let intervalId; //For storing the id of the repeating function for displaying the redline
 let isMouseDown = false;
 let delay = 300;
+let recordMode = false;
+let isRecording = false;
+let initTime = null;
+let initRedlineTime = null;
+let tobeAddedIndex = 0;
+let velocity = 0.5;
+let buffer = [];
 
 let midiBlob = null;
 let midiBase64 = null;
 
 /* Initialize literally everything here */
+function deepClone2(from = {}, to = {}) {
+	// If `from` is an array, the `key` is index of each element
+	for (let key in from) {
+		if (typeof from[key] === "object") {
+			to[key] = Array.isArray(from[key]) ? [] : {};
+			deepClone(from[key], to[key]);
+		} else {
+			// copy primitive types
+			to[key] = from[key];
+		}
+	}
+	return to;
+}
+
+const deepClone = (items) =>
+	items.map((item) => (Array.isArray(item) ? clone(item) : item));
 canvas.style.border = "1px solid #000000";
 canvas.width = CANVAS_W;
 canvas.height = CANVAS_H;
@@ -74,18 +99,13 @@ playButton.addEventListener("click", () => {
 	if (intervalId) {
 		stopPlaying();
 	} else {
-		// FIXME: Playback should continue at red line instead of at start
 		MIDI.Player.BPM = null;
-
 		MIDI.Player.loadFile(midiBase64, () => {
-			console.log("success");
 			MIDI.Player.currentTime = redlineTime;
 			MIDI.Player.start();
-			console.log(MIDI.Player);
 			redlineTime = MIDI.Player.currentTime - delay;
 			playButton.textContent = "Stop";
 			intervalId = setInterval(() => {
-				console.log(MIDI.Player.currentTime);
 				if (redlineTime <= Math.floor(midiFile.duration * 1000)) {
 					redlineTime += Math.round(1000 / FPS);
 					if (redlineTime > endingTime) {
@@ -95,35 +115,6 @@ playButton.addEventListener("click", () => {
 					renderDisplay();
 				} else stopPlaying();
 			}, Math.round(1000 / FPS));
-
-			// let a = performance.now();
-			// let authoritativeClockLast = 0;
-			// let MIDIlast = 0;
-			// let timelineLast = 0;
-
-			// setInterval(() => {
-			// 	const authoritativeClockCurrent = performance.now();
-			// 	const MIDICurrent = MIDI.Player.currentTime;
-			// 	const timelineCurrent = redlineTime;
-			// 	console.log(
-			// 		`Authoritative Clock: ${(authoritativeClockCurrent - a).toFixed(
-			// 			12
-			// 		)} (From last: ${(
-			// 			authoritativeClockCurrent - authoritativeClockLast
-			// 		).toFixed(12)}) \tMIDIjs playing: ${MIDICurrent.toFixed(
-			// 			12
-			// 		)} (From last: ${(MIDICurrent - MIDIlast).toFixed(
-			// 			12
-			// 		)}) \tTimeline: ${timelineCurrent} (From last: ${(
-			// 			timelineCurrent - timelineLast
-			// 		).toFixed(12)}) \tDiff (MIDIjs-timeline): ${(
-			// 			MIDICurrent - timelineCurrent
-			// 		).toFixed(12)}`
-			// 	);
-			// 	authoritativeClockLast = authoritativeClockCurrent;
-			// 	MIDIlast = MIDI.Player.currentTime;
-			// 	timelineLast = redlineTime;
-			// }, 2000);
 		});
 	}
 });
@@ -173,3 +164,81 @@ canvas.addEventListener("mousedown", (event) => {
 canvas.addEventListener("mouseup", (event) => {
 	if (event.button === 0) isMouseDown = false;
 });
+
+//Toggle recording mode by pressing spacebar
+$(document).keydown((e) => {
+	if (e.key == " ") {
+		e.preventDefault();
+		if (recordMode) {
+			isRecording = false;
+			recordMode = false;
+			stopPlaying();
+			tobeAddedIndex = recordedTrack.length;
+			$("#save").css("display", recordedTrack.length > 0 ? "block" : "none");
+			$("#cancel").css("display", recordedTrack.length > 0 ? "block" : "none");
+		} else {
+			recordMode = true;
+			initTime = null;
+			initRedlineTime = null;
+		}
+		renderDisplay();
+	}
+});
+
+$("#save").click((event) => {
+	if (window.confirm("Save changes?")) {
+		recordedTrack.forEach((note) => {
+			midiFile.tracks[selectedTrack - 1].addNote({
+				durationTicks: Math.round(tickPerSec * (note.duration / 1000)),
+				midi: note.pitch,
+				noteOffVelocity: 0,
+				ticks: Math.round((note.startTime / 1000) * tickPerSec),
+				velocity: velocity,
+				duration: note.duration / 1000,
+				time: note.startTime / 1000,
+			});
+		});
+		recordedTrack = [];
+		tobeAddedIndex = 0;
+		$("#save").css("display", "none");
+		$("#cancel").css("display", "none");
+		renderDisplay();
+	}
+});
+
+$("#cancel").click((event) => {
+	recordedTrack = [];
+	tobeAddedIndex = 0;
+	$("#save").css("display", "none");
+	$("#cancel").css("display", "none");
+	renderDisplay();
+});
+
+// let a = performance.now();
+// let authoritativeClockLast = 0;
+// let MIDIlast = 0;
+// let timelineLast = 0;
+
+// setInterval(() => {
+// 	const authoritativeClockCurrent = performance.now();
+// 	const MIDICurrent = MIDI.Player.currentTime;
+// 	const timelineCurrent = redlineTime;
+// 	console.log(
+// 		`Authoritative Clock: ${(authoritativeClockCurrent - a).toFixed(
+// 			12
+// 		)} (From last: ${(
+// 			authoritativeClockCurrent - authoritativeClockLast
+// 		).toFixed(12)}) \tMIDIjs playing: ${MIDICurrent.toFixed(
+// 			12
+// 		)} (From last: ${(MIDICurrent - MIDIlast).toFixed(
+// 			12
+// 		)}) \tTimeline: ${timelineCurrent} (From last: ${(
+// 			timelineCurrent - timelineLast
+// 		).toFixed(12)}) \tDiff (MIDIjs-timeline): ${(
+// 			MIDICurrent - timelineCurrent
+// 		).toFixed(12)}`
+// 	);
+// 	authoritativeClockLast = authoritativeClockCurrent;
+// 	MIDIlast = MIDI.Player.currentTime;
+// 	timelineLast = redlineTime;
+// }, 2000);
