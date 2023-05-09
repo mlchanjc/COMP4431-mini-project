@@ -288,13 +288,17 @@
           <label for="time-slider">Time:</label>
           <div class="input-group" style="max-width: unset">
             <div class="input-group-prepend">
-              <span class="input-group-text">0</span>
+              <span class="input-group-text" id="min-time">
+                0 <!-- Filled by JS -->
+              </span>
             </div>
             <div class="row flex-fill align-items-center mx-0 px-2 border rounded-left">
               <input class="custom-range" id="time-slider" type="range" value="0">
             </div>
             <div class="input-group-append">
-              <span class="input-group-text" id="max-time">0</span>
+              <span class="input-group-text" id="max-time">
+                0 <!-- Filled by JS -->
+              </span>
             </div>
           </div>
         </div>

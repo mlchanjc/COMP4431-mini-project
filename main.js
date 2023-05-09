@@ -4,6 +4,7 @@ let tickPerSec = null;
 let bpm = null;
 let tracks = [];
 const timeSlider = document.getElementById("time-slider");
+const minTime = document.getElementById("min-time");
 const maxTime = document.getElementById("max-time");
 const multiplierSlider = document.getElementById("multiplier-slider");
 const reverseScaleButton = document.getElementById("reverse-scale");

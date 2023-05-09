@@ -21,7 +21,8 @@ const parseFile = (file) => {
 			endingTime = divisionTime * division + startingTime;
 			renderDisplay();
 		});
-		maxTime.textContent = String(Math.floor(midiFile.duration * 1000));
+		minTime.textContent = parseTime(Math.floor(0 * 1000));
+		maxTime.textContent = parseTime(Math.floor(midiFile.duration * 1000));
 
 		console.log(midiFile);
 		tracks = [];
