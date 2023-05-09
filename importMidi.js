@@ -25,8 +25,9 @@ const parseFile = (file) => {
 
 		console.log(midiFile);
 		tracks = [];
-		let temp = midiFile.tracks;
-		tracks = temp;
+		midiFile.tracks.forEach((track) => {
+			tracks.push(track);
+		});
 
 		const t0 = performance.now();
 		midiBlob = new Blob([midiFile.toArray()], { type: "audio/midi" });
@@ -102,6 +103,13 @@ $(list).on("click", ".track-list-delete-track-btn", function (event) {
 		selectedTrack--;
 	}
 
+	//Recompute the preview audio
+	midiBlob = new Blob([midiFile.toArray()], { type: "audio/midi" });
+	const reader = new FileReader();
+	reader.onload = function (e) {
+		midiBase64 = e.target.result;
+	};
+	reader.readAsDataURL(midiBlob);
 	renderList();
 	renderDisplay();
 });

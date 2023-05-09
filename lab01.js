@@ -116,18 +116,30 @@ function handlePianoMouseDown(evt) {
 				}, Math.round(1000 / FPS));
 			if (initTime === null) initTime = new Date().getTime();
 			if (initRedlineTime === null) initRedlineTime = redlineTime;
-			recordedTrack.push({
-				pitch: parseInt($("#pitch").val()) + key_number,
-				startTime: Math.round(
-					new Date().getTime() - initTime + initRedlineTime
-				),
-				duration: new Date().getTime(),
-				ended: false,
-			});
+			pushToTrack(key_number);
+			if ($(":radio[name=play-mode]:checked").val() === "major") {
+				pushToTrack(key_number + 4);
+				pushToTrack(key_number + 7);
+			}
+			if ($(":radio[name=play-mode]:checked").val() === "minor") {
+				pushToTrack(key_number + 3);
+				pushToTrack(key_number + 7);
+			}
 		}
 	}
 }
-
+function pushToTrack(offset) {
+	let pitch = parseInt($("#pitch").val()) + offset;
+	if (pitch <= 108 && pitch >= 21)
+		recordedTrack.push({
+			pitch: pitch,
+			startTime: Math.round(new Date().getTime() - initTime + initRedlineTime),
+			duration: new Date().getTime(),
+			velocity: parseInt($("#amplitude").val()) / 127,
+			ended: false,
+			mode: $(":radio[name=play-mode]:checked").val(),
+		});
+}
 function handlePianoMouseUp(evt) {
 	// last_key_number is used because evt.target does not necessarily
 	// equal to the key that has been clicked on
@@ -142,22 +154,69 @@ function handlePianoMouseUp(evt) {
 	// Show a simple message in the console
 	console.log("Piano mouse up event for key " + last_mouse_key_number + "!");
 
-	// Reset the key number
-	last_mouse_key_number = -1;
 	if (recordMode) {
 		for (let i = recordedTrack.length - 1; i >= 0; i--) {
 			if (
 				recordedTrack[i].pitch ===
-					parseInt($("#pitch").val()) + last_mouse_key_number &&
-				recordedTrack[i].duration === null
+				parseInt($("#pitch").val()) + last_mouse_key_number
 			) {
 				recordedTrack[i].duration =
 					new Date().getTime() - recordedTrack[i].duration;
 				recordedTrack[i].ended = true;
+				if (recordedTrack[i].mode === "major") {
+					for (let j = recordedTrack.length - 1; j >= 0; j--) {
+						if (
+							recordedTrack[j].pitch ===
+							parseInt($("#pitch").val()) + last_mouse_key_number + 4
+						) {
+							recordedTrack[j].duration =
+								new Date().getTime() - recordedTrack[j].duration;
+							recordedTrack[j].ended = true;
+							break;
+						}
+					}
+					for (let k = recordedTrack.length - 1; k >= 0; k--) {
+						if (
+							recordedTrack[k].pitch ===
+							parseInt($("#pitch").val()) + last_mouse_key_number + 7
+						) {
+							recordedTrack[k].duration =
+								new Date().getTime() - recordedTrack[k].duration;
+							recordedTrack[k].ended = true;
+							break;
+						}
+					}
+				}
+				if (recordedTrack[i].mode === "minor") {
+					for (let j = recordedTrack.length - 1; j >= 0; j--) {
+						if (
+							recordedTrack[j].pitch ===
+							parseInt($("#pitch").val()) + last_mouse_key_number + 3
+						) {
+							recordedTrack[j].duration =
+								new Date().getTime() - recordedTrack[j].duration;
+							recordedTrack[j].ended = true;
+							break;
+						}
+					}
+					for (let k = recordedTrack.length - 1; k >= 0; k--) {
+						if (
+							recordedTrack[k].pitch ===
+							parseInt($("#pitch").val()) + last_mouse_key_number + 7
+						) {
+							recordedTrack[k].duration =
+								new Date().getTime() - recordedTrack[k].duration;
+							recordedTrack[k].ended = true;
+							break;
+						}
+					}
+				}
 				break;
 			}
 		}
 	}
+	// Reset the key number
+	last_mouse_key_number = -1;
 }
 
 function handlePageKeyDown(evt) {
@@ -195,12 +254,15 @@ function handlePageKeyDown(evt) {
 			}, Math.round(1000 / FPS));
 		if (initTime === null) initTime = new Date().getTime();
 		if (initRedlineTime === null) initRedlineTime = redlineTime;
-		recordedTrack.push({
-			pitch: parseInt($("#pitch").val()) + key_number,
-			startTime: Math.round(new Date().getTime() - initTime + initRedlineTime),
-			duration: new Date().getTime(),
-			ended: false,
-		});
+		pushToTrack(key_number);
+		if ($(":radio[name=play-mode]:checked").val() === "major") {
+			pushToTrack(key_number + 4);
+			pushToTrack(key_number + 7);
+		}
+		if ($(":radio[name=play-mode]:checked").val() === "minor") {
+			pushToTrack(key_number + 3);
+			pushToTrack(key_number + 7);
+		}
 	}
 }
 
@@ -223,12 +285,61 @@ function handlePageKeyUp(evt) {
 
 	// Reset the key status
 	key_down_status[key_number] = false;
+	console.log(evt.key);
 	if (recordMode) {
 		for (let i = recordedTrack.length - 1; i >= 0; i--) {
 			if (recordedTrack[i].pitch === parseInt($("#pitch").val()) + key_number) {
 				recordedTrack[i].duration =
 					new Date().getTime() - recordedTrack[i].duration;
 				recordedTrack[i].ended = true;
+				if (recordedTrack[i].mode === "major") {
+					for (let j = recordedTrack.length - 1; j >= 0; j--) {
+						if (
+							recordedTrack[j].pitch ===
+							parseInt($("#pitch").val()) + key_number + 4
+						) {
+							recordedTrack[j].duration =
+								new Date().getTime() - recordedTrack[j].duration;
+							recordedTrack[j].ended = true;
+							break;
+						}
+					}
+					for (let k = recordedTrack.length - 1; k >= 0; k--) {
+						if (
+							recordedTrack[k].pitch ===
+							parseInt($("#pitch").val()) + key_number + 7
+						) {
+							recordedTrack[k].duration =
+								new Date().getTime() - recordedTrack[k].duration;
+							recordedTrack[k].ended = true;
+							break;
+						}
+					}
+				}
+				if (recordedTrack[i].mode === "minor") {
+					for (let j = recordedTrack.length - 1; j >= 0; j--) {
+						if (
+							recordedTrack[j].pitch ===
+							parseInt($("#pitch").val()) + key_number + 3
+						) {
+							recordedTrack[j].duration =
+								new Date().getTime() - recordedTrack[j].duration;
+							recordedTrack[j].ended = true;
+							break;
+						}
+					}
+					for (let k = recordedTrack.length - 1; k >= 0; k--) {
+						if (
+							recordedTrack[k].pitch ===
+							parseInt($("#pitch").val()) + key_number + 7
+						) {
+							recordedTrack[k].duration =
+								new Date().getTime() - recordedTrack[k].duration;
+							recordedTrack[k].ended = true;
+							break;
+						}
+					}
+				}
 				break;
 			}
 		}

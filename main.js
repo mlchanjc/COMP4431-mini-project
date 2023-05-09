@@ -45,29 +45,11 @@ let isRecording = false;
 let initTime = null;
 let initRedlineTime = null;
 let tobeAddedIndex = 0;
-let velocity = 0.5;
-let buffer = [];
 
 let midiBlob = null;
 let midiBase64 = null;
 
 /* Initialize literally everything here */
-function deepClone2(from = {}, to = {}) {
-	// If `from` is an array, the `key` is index of each element
-	for (let key in from) {
-		if (typeof from[key] === "object") {
-			to[key] = Array.isArray(from[key]) ? [] : {};
-			deepClone(from[key], to[key]);
-		} else {
-			// copy primitive types
-			to[key] = from[key];
-		}
-	}
-	return to;
-}
-
-const deepClone = (items) =>
-	items.map((item) => (Array.isArray(item) ? clone(item) : item));
 canvas.style.border = "1px solid #000000";
 canvas.width = CANVAS_W;
 canvas.height = CANVAS_H;
@@ -152,13 +134,13 @@ filedrop.addEventListener("change", (e) => {
 
 //Set redline position by clicking the canvas
 canvas.addEventListener("mousemove", (event) => {
-	if (isMouseDown) {
+	if (isMouseDown && midiFile !== null) {
 		setRedlineTime(event);
 	}
 });
 
 canvas.addEventListener("click", (event) => {
-	setRedlineTime(event);
+	if (midiFile !== null) setRedlineTime(event);
 });
 
 const setRedlineTime = (event) => {
@@ -188,7 +170,7 @@ canvas.addEventListener("mouseup", (event) => {
 
 //Toggle recording mode by pressing spacebar
 $(document).keydown((e) => {
-	if (e.key == " ") {
+	if (e.key == " " && midiFile !== null) {
 		e.preventDefault();
 		if (recordMode) {
 			isRecording = false;
@@ -201,6 +183,7 @@ $(document).keydown((e) => {
 			recordMode = true;
 			initTime = null;
 			initRedlineTime = null;
+			$("#play").css("display", "none");
 		}
 		renderDisplay();
 	}
@@ -214,13 +197,20 @@ $("#save").click((event) => {
 				midi: note.pitch,
 				noteOffVelocity: 0,
 				ticks: Math.round((note.startTime / 1000) * tickPerSec),
-				velocity: velocity,
+				velocity: note.velocity,
 				duration: note.duration / 1000,
 				time: note.startTime / 1000,
 			});
 		});
+		midiBlob = new Blob([midiFile.toArray()], { type: "audio/midi" });
+		const reader = new FileReader();
+		reader.onload = function (e) {
+			midiBase64 = e.target.result;
+		};
+		reader.readAsDataURL(midiBlob);
 		recordedTrack = [];
 		tobeAddedIndex = 0;
+		$("#play").css("display", "block");
 		$("#save").css("display", "none");
 		$("#cancel").css("display", "none");
 		renderDisplay();
@@ -228,8 +218,10 @@ $("#save").click((event) => {
 });
 
 $("#cancel").click((event) => {
+	console.log(recordedTrack);
 	recordedTrack = [];
 	tobeAddedIndex = 0;
+	$("#play").css("display", "block");
 	$("#save").css("display", "none");
 	$("#cancel").css("display", "none");
 	renderDisplay();
