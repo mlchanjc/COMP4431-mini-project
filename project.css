@@ -121,3 +121,8 @@
     border: 1px solid black;
     border-collapse: collapse;
 } */
+
+#time-now-display {
+    font-size: 200%;
+    color: purple;
+}

@@ -195,6 +195,8 @@ const renderDisplay = () => {
 			1.5,
 			CANVAS_H - HEADER_H
 		);
+
+	$("#time-now-display").text(parseTime(redlineTime));
 };
 
 const renderTrack = () => {
