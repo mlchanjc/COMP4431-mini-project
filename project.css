@@ -80,24 +80,24 @@
     background: #000;
 }
 
-#toolbar{
+#toolbar {
     width: 1500px;
     display: flex;
     flex-direction: row;
-    justify-content:space-around;
+    justify-content: space-around;
     flex-wrap: nowrap;
     align-items: center;
 }
 
-.col-6{
+.col-6 {
     flex: 1;
 }
 
-.input-group{
+.input-group {
     max-width: 250px;
 }
 
-#row2{
+#row2 {
     width: 1500px;
     display: flex;
     flex-direction: row;
